@@ -67,7 +67,7 @@
     border-bottom: 1px solid var(--rule);
     background: color-mix(in srgb, var(--paper) 92%, transparent);
     backdrop-filter: blur(6px);
-    z-index: 500;
+    z-index: 800;
   }
   .status-bar .left, .status-bar .right { display: flex; gap: 18px; align-items: center; }
   .status-bar .mark {
@@ -2418,6 +2418,12 @@ Rules:
 
 </div>
 
+<div class="video-overlay" id="video-overlay" role="dialog" aria-label="Slide video player">
+  <span class="label" id="video-label">Slide 01</span>
+  <button class="close" id="video-close">ESC · CLOSE</button>
+  <video id="slide-video" controls preload="none" playsinline></video>
+</div>
+
 <script>
   const notes = {
     1: "Today I want to show you three ways to run AI models directly on your laptop — no internet required, no subscription, no data leaving your machine. By the end of this, you'll know which tool fits your hardware, how to customize the AI's personality, and how to hook it into your notes. Let's go.",
@@ -2515,6 +2521,18 @@ Rules:
     videoOpen = true;
     slideVideo.play().catch(() => { /* user gesture required; controls available */ });
   }
+  function openSubpageVideo(name) {
+    if (!name) return;
+    slideVideo.src = 'videos/sub-' + name + '.mp4';
+    videoLabel.textContent = 'Deep dive — ' + (subpageTitles[name] || name);
+    videoOverlay.classList.add('open');
+    videoOpen = true;
+    slideVideo.play().catch(() => {});
+  }
+  function playContextualVideo() {
+    if (subpageOpen) openSubpageVideo(currentSubpage);
+    else openVideo(current);
+  }
   function closeVideo() {
     slideVideo.pause();
     slideVideo.removeAttribute('src');
@@ -2522,7 +2540,7 @@ Rules:
     videoOverlay.classList.remove('open');
     videoOpen = false;
   }
-  document.getElementById('play-video-btn').addEventListener('click', () => openVideo(current));
+  document.getElementById('play-video-btn').addEventListener('click', playContextualVideo);
   document.getElementById('video-close').addEventListener('click', closeVideo);
   videoOverlay.addEventListener('click', (e) => { if (e.target === videoOverlay) closeVideo(); });
   slideVideo.addEventListener('ended', closeVideo);
@@ -2540,6 +2558,12 @@ Rules:
     // Subpage takes priority for Escape
     if (subpageOpen && key === 'Escape') {
       closeSubpage();
+      e.preventDefault();
+      return;
+    }
+    // V plays the contextual video even inside a subpage
+    if (subpageOpen && (key === 'v' || key === 'V')) {
+      openSubpageVideo(currentSubpage);
       e.preventDefault();
       return;
     }
@@ -2623,6 +2647,15 @@ Rules:
   // ============ Subpage (modal) handling ============
   const subpageOverlay = document.getElementById('subpage-overlay');
   let subpageOpen = false;
+  let currentSubpage = null;
+
+  const subpageTitles = {
+    'localdocs': 'LocalDocs deep dive',
+    'obsidian': 'Obsidian deep dive',
+    'ollama-api': 'Ollama API cookbook',
+    'modelfile': 'Modelfile gallery',
+    'mobile': 'Mobile & on-device',
+  };
 
   function openSubpage(name) {
     // Hide any currently-active subpage, show the requested one
@@ -2633,11 +2666,13 @@ Rules:
     subpageOverlay.classList.add('open');
     subpageOverlay.scrollTop = 0;
     subpageOpen = true;
+    currentSubpage = name;
   }
 
   function closeSubpage() {
     subpageOverlay.classList.remove('open');
     subpageOpen = false;
+    currentSubpage = null;
     // Clear active after transition
     setTimeout(() => {
       subpageOverlay.querySelectorAll('.subpage').forEach(sp => sp.classList.remove('active'));
@@ -2696,13 +2731,6 @@ Rules:
 
   updateChrome();
 </script>
-
-
-<div class="video-overlay" id="video-overlay" role="dialog" aria-label="Slide video player">
-  <span class="label" id="video-label">Slide 01</span>
-  <button class="close" id="video-close">ESC · CLOSE</button>
-  <video id="slide-video" controls preload="none" playsinline></video>
-</div>
 
 </body>
 </html>

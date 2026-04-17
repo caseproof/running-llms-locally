@@ -6,3 +6,4 @@ videos-tmp/
 *.log
 .DS_Store
 .wolf/
+tools/

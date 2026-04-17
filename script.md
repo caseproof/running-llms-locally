@@ -122,11 +122,11 @@ $ ollama run llama3.1:8b
 ```
 $ ollama run llama3.1:8b
 
->>> Haiku about a stubborn compiler.
+>>> Write a haiku about Monday morning.
 
-Red lines of anger,
-semicolons dance and miss —
-the coffee grows cold.
+Alarm clock lying,
+coffee not strong enough yet —
+the week stares me down.
 
 >>> /?   # list slash commands
 >>> /bye # exit

@@ -1,0 +1,24 @@
+{
+  "name": "running-llms-locally-videos",
+  "version": "1.0.0",
+  "description": "Remotion videos for the Running LLMs Locally slide deck",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion render",
+    "render-all": "node render-all.mjs",
+    "tts": "node tts.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.448",
+    "@remotion/bundler": "4.0.448",
+    "@remotion/renderer": "4.0.448",
+    "remotion": "4.0.448",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.3"
+  }
+}

@@ -1287,6 +1287,72 @@
     .rag-flow .flow-step { padding: 12px 8px; }
   }
 
+  /* ---- Video overlay ---- */
+  .video-btn {
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 160ms ease;
+  }
+  .video-btn:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+    background: color-mix(in srgb, var(--paper-2) 80%, transparent);
+  }
+  .video-btn .play-icon {
+    display: inline-block;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .video-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .video-overlay.open { display: flex; opacity: 1; }
+  .video-overlay video {
+    max-width: 94vw;
+    max-height: 88vh;
+    background: #000;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  }
+  .video-overlay .close {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  .video-overlay .close:hover { border-color: #fff; }
+  .video-overlay .label {
+    position: absolute;
+    top: 28px;
+    left: 32px;
+    color: rgba(255, 255, 255, 0.55);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
 </style>
 </head>
 <body>
@@ -1297,6 +1363,7 @@
     <span>Local LLMs &middot; a tour</span>
   </div>
   <div class="right">
+    <button class="video-btn" id="play-video-btn" title="Play video for this slide (V)"><span class="play-icon">▶</span>Video</button>
     <span id="slide-counter">01 / 10</span>
   </div>
 </div>
@@ -2433,9 +2500,42 @@ Rules:
     overviewGrid.appendChild(card);
   }
 
+  // ---- Video overlay ----
+  const videoOverlay = document.getElementById('video-overlay');
+  const slideVideo = document.getElementById('slide-video');
+  const videoLabel = document.getElementById('video-label');
+  let videoOpen = false;
+
+  function openVideo(n) {
+    if (n < 1 || n > total) return;
+    const id = 'slide-' + String(n).padStart(2, '0');
+    slideVideo.src = 'videos/' + id + '.mp4';
+    videoLabel.textContent = 'Slide ' + String(n).padStart(2, '0') + ' — ' + (titles[n] || '');
+    videoOverlay.classList.add('open');
+    videoOpen = true;
+    slideVideo.play().catch(() => { /* user gesture required; controls available */ });
+  }
+  function closeVideo() {
+    slideVideo.pause();
+    slideVideo.removeAttribute('src');
+    slideVideo.load();
+    videoOverlay.classList.remove('open');
+    videoOpen = false;
+  }
+  document.getElementById('play-video-btn').addEventListener('click', () => openVideo(current));
+  document.getElementById('video-close').addEventListener('click', closeVideo);
+  videoOverlay.addEventListener('click', (e) => { if (e.target === videoOverlay) closeVideo(); });
+  slideVideo.addEventListener('ended', closeVideo);
+
   document.addEventListener('keydown', (e) => {
     if (e.target.matches('input, textarea')) return;
     const key = e.key;
+
+    // Video overlay takes highest priority
+    if (videoOpen) {
+      if (key === 'Escape') { closeVideo(); e.preventDefault(); }
+      return;
+    }
 
     // Subpage takes priority for Escape
     if (subpageOpen && key === 'Escape') {
@@ -2466,6 +2566,8 @@ Rules:
       toggleOverview(); e.preventDefault();
     } else if (key === 'f' || key === 'F') {
       toggleFullscreen(); e.preventDefault();
+    } else if (key === 'v' || key === 'V') {
+      openVideo(current); e.preventDefault();
     } else if (/^[1-9]$/.test(key)) {
       show(parseInt(key, 10)); e.preventDefault();
     } else if (key === '0') {
@@ -2595,6 +2697,12 @@ Rules:
   updateChrome();
 </script>
 
+
+<div class="video-overlay" id="video-overlay" role="dialog" aria-label="Slide video player">
+  <span class="label" id="video-label">Slide 01</span>
+  <button class="close" id="video-close">ESC · CLOSE</button>
+  <video id="slide-video" controls preload="none" playsinline></video>
+</div>
 
 </body>
 </html>

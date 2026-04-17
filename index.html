@@ -706,6 +706,13 @@
   }
   .resources li:last-child { border-bottom: none; }
   .resources li span { color: var(--accent); font-size: 11px; letter-spacing: 0.1em; }
+  .resources li a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 160ms ease, color 160ms ease;
+  }
+  .resources li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
   .notes-panel {
     position: fixed;
@@ -1711,10 +1718,10 @@ questions. Demand insanely great."""</span></div>
       <div class="resources">
         <h3>Resources</h3>
         <ul>
-          <li>gpt4all.io <span>APP</span></li>
-          <li>lmstudio.ai <span>GUI</span></li>
-          <li>ollama.com <span>CLI</span></li>
-          <li>huggingface.co/models <span>MODELS</span></li>
+          <li><a href="https://gpt4all.io" target="_blank" rel="noopener">gpt4all.io</a> <span>APP</span></li>
+          <li><a href="https://lmstudio.ai" target="_blank" rel="noopener">lmstudio.ai</a> <span>GUI</span></li>
+          <li><a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a> <span>CLI</span></li>
+          <li><a href="https://huggingface.co/models" target="_blank" rel="noopener">huggingface.co/models</a> <span>MODELS</span></li>
         </ul>
         <p style="margin-top:20px;font-family:'Fraunces',serif;font-style:italic;font-variation-settings:'SOFT' 100;font-size:17px;color:var(--ink-2);line-height:1.4;">Now go make your laptop a little smarter.</p>
       </div>
